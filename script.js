@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bot for surfing
 // @namespace    http://tampermonkey.net/
-// @version      0.1.3
+// @version      0.1.4
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.google.com/*
@@ -34,6 +34,8 @@ setTimeout(()=>{
         }
         else {
             setInterval(()=>{
+                if (Math.random()>0.7)
+                    location.href="https://www.google.com";
                 let index = Math.floor(Math.random()*links.length);
                 if (links[index].href.indexOf("xn----7sbab5aqcbiddtdj1e1g.xn--p1ai")!=-1){
                     links[index].click();
