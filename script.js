@@ -8,10 +8,63 @@
 // @match        https://xn----7sbab5aqcbiddtdj1e1g.xn--p1ai/*
 // @grant        none
 // ==/UserScript==
+
+function setCookie(name, value, options = {}) {
+
+  options = {
+    path: '/',
+    // при необходимости добавьте другие значения по умолчанию
+    ...options
+  };
+
+  if (options.expires.toUTCString) {
+    options.expires = options.expires.toUTCString();
+  }
+
+  let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+  for (let optionKey in options) {
+    updatedCookie += "; " + optionKey;
+    let optionValue = options[optionKey];
+    if (optionValue !== true) {
+      updatedCookie += "=" + optionValue;
+    }
+  }
+
+  document.cookie = updatedCookie;
+}
+
+function deleteCookie(name) {
+  setCookie(name, "", {
+    'max-age': -1
+  })
+}
+
 setTimeout(()=>{
-    let keywords = ["Гобой","Кларнет","Флейта","Волторна","Тромбон"];
-    let keyword = keywords[Math.floor(Math.random()*keywords.length)];
+    function getCookie(name) {
+  let matches = document.cookie.match(new RegExp(
+    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  ));
+  return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+
+
+
+    let sites = {
+		"crushdrummers.ru":["Барабанное шоу","Шоу барабанщиков","Заказать барабанное шоу москва"],
+		"xn----7sbab5aqcbiddtdj1e1g.xn--p1ai":["Гобой","Кларнет","Флейта","Волторна","Тромбон"],
+		"nightbeat.ru":["Барабанное шоу","Шоу барабанщиков","Заказать барабанное шоу москва"]
+	}
+    let randomProperty = function (obj) {
+    let keys = Object.keys(obj)
+	return keys[ keys.length * Math.random() << 0]; //   <<0 - вместо Math.floor,
+	};
+	let site = randomProperty(sites);
+    let keyword = sites[site][sites[site].length * Math.random() << 0];;
     let nextPage= true;
+	if(getCookie("target")==undefined)
+	document.cookie = "target="+site;
     try {
         document.getElementsByName("q")[0].value=keyword;
         document.getElementsByName("btnK")[0].click();
@@ -19,13 +72,15 @@ setTimeout(()=>{
         let links = document.links;
         if (location.hostname=="www.google.com"){
             for (let i=0; i<links.length; i++){
-                if (links[i].href.indexOf("xn----7sbab5aqcbiddtdj1e1g.xn--p1ai")!=-1 && links[i].href.indexOf("webcache")==-1){
+                if (links[i].href.indexOf(site)!=-1 && links[i].href.indexOf("webcache")==-1){
                     nextPage = false;
-                    links[i].click();
+                    deleteCookie("target");
+					links[i].click();
                 }
             }
             if (document.getElementsByClassName("cur")[0].innerText==10){
                 nextPage = false;
+				deleteCookie("target");
                 location.href="https://www.google.com";
             }
 
@@ -45,4 +100,8 @@ setTimeout(()=>{
     }
 
 },3000);
+
+
+
+
 
